@@ -21,6 +21,7 @@ def create_app():
     app.register_blueprint(gameBp, url_prefix='/')
 
     from .models import User, UserAnswers, Questions
+    
 
     with app.app_context():
         db.create_all()

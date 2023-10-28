@@ -4,6 +4,11 @@ from flask_login import current_user
 from . import db
 
 
+def AnsweredRight():
+    print("concratulations! You answered right on this question!")
+
+
+
 gameBp = Blueprint('game', __name__)
 
 @gameBp.route('/Upload', methods = ['POST', 'GET'])
@@ -21,6 +26,9 @@ def UploadData():
     data = UserAnswers(user_answer=user_answer, answer=answer, user_id=user_id)
     db.session.add(data)
     db.session.commit()
+
+    if answer == 1:
+        return 
     
     return render_template('upload.html', user=current_user)
 
