@@ -1,7 +1,10 @@
+import random
 from curses import flash
 from flask import Blueprint, render_template, request
 from flask_login import current_user
 from . import db
+from .models import Questions
+import sys 
 
 
 def AnsweredRight():
@@ -10,6 +13,12 @@ def AnsweredRight():
 
 
 gameBp = Blueprint('game', __name__)
+
+@gameBp.route('/', methods = ['POST', 'GET'])
+def Game():
+    sql_data = Questions.query.filter_by(id=random.randint(1, 2)).first()
+    return sql_data.question
+
 
 @gameBp.route('/Upload', methods = ['POST', 'GET'])
 def UploadData():
@@ -30,7 +39,7 @@ def UploadData():
     if answer == 1:
         return 
     
-    return render_template('upload.html', user=current_user)
+    return "hej"
 
 @gameBp.route('/viewdata', methods = ['GET'])
 def VeiwData():
