@@ -1,7 +1,7 @@
 import random
 from curses import flash
 from flask import Blueprint, render_template, request
-from flask_login import current_user
+from flask_login import login_user, login_required, current_user
 from . import db
 from .models import Questions
 import sys 
@@ -14,7 +14,7 @@ def AnsweredRight():
 
 gameBp = Blueprint('game', __name__)
 
-@gameBp.route('/', methods = ['POST', 'GET'])
+@gameBp.route('/gamequestion', methods = ['POST', 'GET'])
 @login_required
 def Game():
     sql_data = Questions.query.filter_by(id=random.randint(1, 2)).first()
@@ -22,6 +22,7 @@ def Game():
 
 
 @gameBp.route('/answer', methods = ['POST', 'GET'])
+@login_required
 def Answer():
     user_answer = request.form['user_answer']
     question = request.form['question']
@@ -41,16 +42,6 @@ def Answer():
     
     return "hej"
 
-@gameBp.route('/viewdata', methods = ['GET'])
-def VeiwData():
-    try:
-        sql_data = db.session.execute(db.select(EnviromentDetails)).scalars()
-        list = ''
-        for data in sql_data:
-            list += (data.humidity + '% , ' + data.dateTime + ':')
-        return render_template('view_data.html', list=list, user=current_user) 
-    except Exception as e:
-        # e holds description of the error
-        error_text = "<p>The error:<br>" + str(e) + "</p>"
-        hed = '<h1>Something is broken.</h1>'
-        return hed + error_text
+@gameBp.route('/', methods = ['GET'])
+def Error():
+    return "Something went wrong!"

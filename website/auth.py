@@ -7,8 +7,6 @@ from flask_login import login_user, login_required, logout_user, current_user
 import sys 
 
 auth = Blueprint('auth', __name__)
-key_crypt = b"\xd1=\x13l\xfa\xef{\xa7\x00\x87L\xd1\xc5\xb2Il\x88\x0e\x89\xf8\x0f\xbc\xca\xe8\xdb\x81\xdao|\xedZ'"
-
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
@@ -20,7 +18,7 @@ def login():
         if user:
             if Hash.check_hash(password, user.password):
                 login_user(user, remember=True)
-                return render_template('login.html', user=current_user)
+                return render_template('login.html', user=current_user, remember=True)
             else:
                 flash('Incorrect password, try again.', category='error')
         else:

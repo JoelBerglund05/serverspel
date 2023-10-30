@@ -29,7 +29,7 @@ def create_app():
         db.create_all()
 
     login_manager = LoginManager()
-    login_manager.login_view = 'views'
+    login_manager.login_view = 'game.Error'
     login_manager.init_app(app)
 
 
