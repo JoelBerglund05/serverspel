@@ -2,7 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager
-from wsgiserver import WSGIServer
+from .wsgiserver import WSGIServer
 
 db = SQLAlchemy()
 DB_NAME = "database.db"

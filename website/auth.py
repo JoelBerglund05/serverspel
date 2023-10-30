@@ -20,7 +20,7 @@ def login():
         if user:
             if Hash.check_hash(password, user.password):
                 login_user(user, remember=True)
-                return "login successful"
+                return render_template('login.html', user=current_user)
             else:
                 flash('Incorrect password, try again.', category='error')
         else:

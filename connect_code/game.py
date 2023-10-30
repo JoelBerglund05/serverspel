@@ -1,8 +1,6 @@
 import requests
 import getpass
-from .connect_server import Post
-
-
+import connect_server
 
 login_loop = True
 
@@ -28,7 +26,7 @@ while login_loop is True:
             'username': username,
             'password': password[0]
         }
-        form_response = Post.PostData(data, url)
+        form_response = connect_server.Post.PostData(data, url)
 
         if form_response.status_code == 200:
             print(form_response.text)
@@ -42,6 +40,13 @@ if game_loop is True:
 
 while game_loop is True:
     if game_start == "y":
-        form_response = Post.PostNoData("/")
+        form_response = connect_server.Post.PostNoData("/")
         if form_response.status_code == 200:
-            answer = input(from_response.text)
+            answer = input(form_response.text)
+            form_response = connect_server.Post.PostNoData("/answer")
+            if form_response.status_code == 200:
+                print(form_response.text)
+            else:
+                print(form_response.status_code)
+        game_start = input("Would you like to conntinue the game (y/n): ").lower()
+print("Goodbye!")

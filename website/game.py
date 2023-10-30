@@ -15,29 +15,29 @@ def AnsweredRight():
 gameBp = Blueprint('game', __name__)
 
 @gameBp.route('/', methods = ['POST', 'GET'])
+@login_required
 def Game():
     sql_data = Questions.query.filter_by(id=random.randint(1, 2)).first()
     return sql_data.question
 
 
-@gameBp.route('/Upload', methods = ['POST', 'GET'])
-def UploadData():
+@gameBp.route('/answer', methods = ['POST', 'GET'])
+def Answer():
     user_answer = request.form['user_answer']
-    question_id = request.form['question_id']
-    user_id = request.form['user_id']
-    sql_data_question = Questions.query.filter_by(id=question_id).first()
+    question = request.form['question']
+    sql_data_question = Questions.query.filter_by(question=question).first()
 
     if sql_data_question.answer == user_answer:
         answer = 1
     else:
         answer = 0
 
-    data = UserAnswers(user_answer=user_answer, answer=answer, user_id=user_id)
+    data = UserAnswers(user_answer=user_answer, answer=answer)
     db.session.add(data)
     db.session.commit()
 
     if answer == 1:
-        return 
+        return render_template('answer_right.html', user=current_user)
     
     return "hej"
 
