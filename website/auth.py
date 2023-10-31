@@ -18,13 +18,13 @@ def login():
         if user:
             if Hash.check_hash(password, user.password):
                 login_user(user, remember=True)
-                return render_template('login.html', user=current_user, remember=True)
+                return render_template('login.html', user=current_user)
             else:
                 flash('Incorrect password, try again.', category='error')
         else:
             flash('username does not exist.', category='error')
-
-    return print("sad):")
+    else:
+        return render_template('login.html', user=current_user)  
 
 
 @auth.route('/logout')
@@ -52,6 +52,4 @@ def sign_up():
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user, remember=True)
-            return print("successfully signed up")
-
-    return print("sad):")
+            return render_template('sign_up.html', user=current_user)

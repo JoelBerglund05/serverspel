@@ -1,1 +1,49 @@
-login Successfully!
+{% extends "index.html" %} {% block title %}Login{% endblock %} {% block content%}
+<form action="" method="post">
+    <div class="row justify-content-around h-100vh">
+      <div class="card center-card card-style col-4">
+        <div class="card-body">
+          <h1 class="card-title text-center pb-5">Login</h1>
+          <div class="d-flex">
+            <label for="username">Username</label>
+          </div>
+          <div class="d-flex justify-content-around">
+            <input
+              class="mb-5 input-style"
+              id="username"
+              name="username"
+              type="username"
+              placeholder="username"
+            />
+          </div>
+          <div class="d-flex">
+            <label for="password">Password</label>
+          </div>
+          <div class="d-flex justify-content-around">
+            <input
+              class="mb-5 input-style"
+              id="password"
+              name="password"
+              type="password"
+              placeholder="password"
+            />
+          </div>
+          <div class="d-flex justify-content-around">
+            <p>Don't use your "main" password securety it not implemneted.</p>
+          </div>
+          <div class="d-flex justify-content-around mb-5">
+            <button type="submit" class="btn btn-primary px-4 btn-style">
+              Submit
+            </button>
+          </div>
+          <div class="signup-style">
+            <p>
+              If you don't have an acound sign up
+              <a href="/sign-up" name="sign_up">here</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+{% endblock %}
