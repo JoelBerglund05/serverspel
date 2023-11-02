@@ -27,3 +27,5 @@ class GameSessions(db.Model):
     game_session_id = db.Column(db.String(128))
     player1_score = db.Column(db.Integer)
     player2_score = db.Column(db.Integer)
+    player_turn = db.Column(db.String(150))
+    current_question_id = db.Column(db.Integer)

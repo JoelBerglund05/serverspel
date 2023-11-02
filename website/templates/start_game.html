@@ -1,11 +1,7 @@
 {% extends "index.html" %} {% block title %}Login{% endblock %} {% block content%}
-
-    {% with messages = get_flashed_messages() %} {% if
-        messages %}
         <div class="d-flex justify-content-around">
-            {{ messages }}
+            {{ question }}
         </div>
-        {% endfor %} {% endif %} {% endwith %}
         <form action="" method="post">
                     <label for="username">Username</label>
                   <div class="d-flex justify-content-around">
