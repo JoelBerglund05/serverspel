@@ -3,7 +3,7 @@ import importlib
 import connect_server
 
 question_add = input('Add Question')
-answer = input('Answer')
+answer = input('Answer').lower()
 data = {
     'question': question_add,
     'answer': answer

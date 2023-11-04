@@ -7,55 +7,103 @@ from .models import Questions, GameSessions
 import sys 
 import secrets
 
-def Game():
-    sql_data = Questions.query.filter_by(id=random.randint(1, 2))
-    return sql_data
+def GameSession():
+    game_session_id = secrets.token_hex(16)
+    player_name = current_user.username
+    player1_score = 0
+    player2_score = 0
+    data = GameSessions(player1=player_name, player2="...", game_session_id=game_session_id, player1_score=player1_score, player2_score=player2_score)
+    db.session.add(data)
+    db.session.commit()
+
+def AddUserAnswer():
+    data = UserAnswers(user_answer=user_answer, answer=answer)
+    db.session.add(data)
+    db.session.commit()
+
+def GameQuestion():
+    return Questions.query.filter_by(id=random.randint(1, 2)).first()
+
+def TryResponse(request_response):
+    #kolla med Rikard!!
+    try:
+        user_answer = request.form[request_response]
+    except KeyError:
+        user_answer = None
+    return user_answer
+
+def CheckAnswer(game_token, question, user_answer):
+    sql_data_question = Questions.query.filter_by(question=question).first()
+
+    if sql_data_question.answer == user_answer:
+        answer = 1
+        AddUserAnswer()
+        return render_template('answer_right.html', user=current_user, answer="Correct answer!", game_token=game_token)
+    else:
+        answer = 0
+        return render_template('answer_right.html', user=current_user, answer="Wrong answer!", game_token=game_token)
 
 gameBp = Blueprint('game', __name__)
 
 @gameBp.route('/start-game', methods = ['POST', 'GET'])
 @login_required
 def StartGame():
-    find_game_session = GameSessions.query.filter_by(player2="...").first()
-    if find_game_session.player1 != current_user.username:
-        find_game_session.player2 = current_user.username
-        find_game_session.player_turn = current_user.username
-        question_data = Game()
-        find_game_session.current_question_id = question_data.id
-        db.session.commit()
-        
-        return render_template('start_game.html', user=current_user, question=question)
+    if GameSessions.query.filter_by(player2="...").first() is None:
+        GameSession()
+        return "loading..."
     else:
-        game_session_id = secrets.token_hex(16)
-        player_name = current_user.username
-        player1_score = 0
-        player2_score = 0
-        data = GameSessions(player1=player_name, player2="...", game_session_id=game_session_id, player1_score=player1_score, player2_score=player2_score)
-        db.session.add(data)
-        db.session.commit()
-    return render_template('start_game.html', user=current_user)
+        try_response = TryResponse()
+        find_game_session = GameSessions.query.filter_by(player2="...").first()
+        if find_game_session.player1 != current_user.username and try_response is None:
+            find_game_session.player2 = current_user.username
+            find_game_session.player_turn = current_user.username
+            question_data = GameQuestion()
+            find_game_session.current_question_id = question_data.id
+            db.session.commit()
+            return render_template('start_game.html', user=current_user, question=question_data.question)
+        elif user_answer is None:
+            GameSession()
+            return render_template('created_game.html', user=current_user, message="Created game! Pleas check Connect to old game to see if we have found a new game.")
+        else:
+            return CheckAnswer()
 
 
-@gameBp.route('/answer', methods = ['POST', 'GET'])
+    return "something went wrong!"
+
+@gameBp.route('/connect-game', methods = ['POST', 'GET'])
 @login_required
-def Answer():
-    user_answer = request.form['user_answer']
-    question = request.form['question']
-    sql_data_question = Questions.query.filter_by(question=question).first()
+def ConnectGame():
+    active_games = GameSessions.query.filter_by(player2=current_user.username).all()
+    active_games += GameSessions.query.filter_by(player1=current_user.username).all()
+    enemy_names = []
+    game_tokens = []
+    for i in active_games:
+        if i.player1 != current_user.username:
+            enemy_names.append(i.player1)
+            game_tokens.append(i.game_session_id)
+        elif i.player2 != current_user.username:
+            enemy_names.append(i.player2)
+            game_tokens.append(i.game_session_id)
 
-    if sql_data_question.answer == user_answer:
-        answer = 1
+        
+    if len(active_games) > 0:
+        return render_template('game.html', user=current_user , active_games=enemy_names, game_tokens=game_tokens)
     else:
-        answer = 0
+        return render_template('created_game.html', user=current_user, message="No active game found")
 
-    data = UserAnswers(user_answer=user_answer, answer=answer)
-    db.session.add(data)
-    db.session.commit()
-
-    if answer == 1:
-        return render_template('answer_right.html', user=current_user)
-    
-    return "hej"
+@gameBp.route('/game', methods = ['POST', 'GET'])
+@login_required
+def Game(game_token):
+    try_response = [TryResponse('user_answer'), game_token]
+    game_session = GameSessions.query.filter_by(game_session_id=game_token).first()
+    if game_session.player1 == current_user.username or game_session.player2 == current_user.username and game_session.player_turn == current_user.username:
+        if try_response[0] == None:
+            question = GameQuestion()
+            return render_template('game_question.html', user=current_user, question=question.question, game_token=try_response[1])
+        else:
+            return CheckAnswer(game_token)
+    else:
+        return render_template('game.html', user=current_user, active_games=game_session.player1, game_tokens=game_session.game_session_id)
 
 @gameBp.route('/', methods = ['GET'])
 def Home():
