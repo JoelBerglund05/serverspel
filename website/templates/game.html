@@ -3,7 +3,7 @@
     {% for i in active_games %}
         {% if i != "..." %}
         <ul>
-            <form action="" method="post"><input type="hidden" value="{{ game_tokens[i] }}"><button>{{ i }}</button></form>
+            <a href="{{ url_for('game.Game', game_token=game_tokens[active_games.index(i)]) }}">{{ i }}</a>
         </ul>
         {% endif %}
     {% endfor %}
