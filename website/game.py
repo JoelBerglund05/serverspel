@@ -25,7 +25,6 @@ def GameQuestion():
     return Questions.query.filter_by(id=random.randint(1, 2)).first()
 
 def TryResponse(request_response):
-    #kolla med Rikard!!
     try:
         user_answer = request.form[request_response]
     except KeyError:
@@ -80,26 +79,36 @@ def ConnectGame():
     for i in active_games:
         if i.player1 != current_user.username:
             enemy_names.append(i.player1)
-            game_tokens.append(i.game_session_id)
+            token = str(i.game_session_id)
+            game_tokens.append(token)
         elif i.player2 != current_user.username:
             enemy_names.append(i.player2)
-            game_tokens.append(i.game_session_id)
+            token = str(i.game_session_id)
+            game_tokens.append(token)
 
-        
+        print(game_tokens)
     if len(active_games) > 0:
         return render_template('game.html', user=current_user , active_games=enemy_names, game_tokens=game_tokens)
     else:
         return render_template('created_game.html', user=current_user, message="No active game found")
 
-@gameBp.route('/game', methods = ['POST', 'GET'])
+@gameBp.route('/game/<game_token>', methods = ['POST', 'GET'])
 @login_required
-def Game(game_token):
-    try_response = [TryResponse('user_answer'), game_token]
+def Game():
+    game_token = request.args.get('game_token')
+
+    if game_token is None:
+        return "no game token!"
+
+    user_data = [TryResponse('user_answer'), game_token]
+    print(user_data)
     game_session = GameSessions.query.filter_by(game_session_id=game_token).first()
     if game_session.player1 == current_user.username or game_session.player2 == current_user.username and game_session.player_turn == current_user.username:
-        if try_response[0] == None:
+        if user_data[0] == None and game_session.player_turn == current_user.username:
             question = GameQuestion()
-            return render_template('game_question.html', user=current_user, question=question.question, game_token=try_response[1])
+            return render_template('game_question.html', user=current_user, question=question.question, game_token=user_data[1])
+        elif user_data[0] == None:
+            return "not your turn!"
         else:
             return CheckAnswer(game_token)
     else:
