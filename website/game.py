@@ -79,12 +79,10 @@ def ConnectGame():
     for i in active_games:
         if i.player1 != current_user.username:
             enemy_names.append(i.player1)
-            token = str(i.game_session_id)
-            game_tokens.append(token)
+            game_tokens.append(i.game_session_id)
         elif i.player2 != current_user.username:
             enemy_names.append(i.player2)
-            token = str(i.game_session_id)
-            game_tokens.append(token)
+            game_tokens.append(i.game_session_id)
 
         print(game_tokens)
     if len(active_games) > 0:
@@ -94,13 +92,12 @@ def ConnectGame():
 
 @gameBp.route('/game/<game_token>', methods = ['POST', 'GET'])
 @login_required
-def Game():
-    game_token = request.args.get('game_token')
+def Game(game_token):
 
     if game_token is None:
         return "no game token!"
 
-    user_data = [TryResponse('user_answer'), game_token]
+    user_data = [TryResponse('user_answer'), game_token, TryResponse("question")]
     print(user_data)
     game_session = GameSessions.query.filter_by(game_session_id=game_token).first()
     if game_session.player1 == current_user.username or game_session.player2 == current_user.username and game_session.player_turn == current_user.username:
@@ -110,7 +107,7 @@ def Game():
         elif user_data[0] == None:
             return "not your turn!"
         else:
-            return CheckAnswer(game_token)
+            return CheckAnswer(user_data[1], user_data[2], user_data[0])
     else:
         return render_template('game.html', user=current_user, active_games=game_session.player1, game_tokens=game_session.game_session_id)
 
