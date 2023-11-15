@@ -7,6 +7,10 @@ from .models import Questions, GameSessions
 import sys 
 import secrets
 
+# TODO: Remove all debug code
+# TODO: Clean up code 
+# TODO: Redo bad code 
+
 def GameSession():
     game_session_id = secrets.token_hex(16)
     player_name = current_user.username
@@ -16,12 +20,23 @@ def GameSession():
     db.session.add(data)
     db.session.commit()
 
-def AddUserAnswer(answer):
-    # TODO: Fix
-    if answer == True:
-        sql_data_question = GameSessions.query.filter_by(Player1=Current).first()
-        db.session.add(data)
-        db.session.commit()
+def ScoreAdder(answer_bool, game_token):
+    sql_data = GameSessions.query.filter_by(game_session_id=game_token).first()
+    if answer_bool == True:
+        if sql_data.player_turn == sql_data.player1:
+            sql_data.player1_score += 1
+            sql_data.player_turn = sql_data.player2
+        else:
+            sql_data.player2_score += 1
+            sql_data.player_turn = sql_data.player1
+    elif answer_bool == False:
+        if sql_data.player_turn == sql_data.player1:
+            sql_data.player_turn = sql_data.player2
+        else:
+            sql_data.player_turn = sql_sql.player1
+    db.session.commit()
+
+
 
 def GameQuestion():
     return Questions.query.filter_by(id=random.randint(1, 2)).first()
@@ -37,11 +52,11 @@ def CheckAnswer(game_token, question, user_answer):
     sql_data_question = Questions.query.filter_by(question=question).first()
     print(sql_data_question.answer)
     if sql_data_question.answer == user_answer:
-        answer = True
-        AddUserAnswer()
+        answer_bool = True
+        ScoreAdder(answer_bool, game_token)
         return render_template('answer_right.html', user=current_user, answer="Correct answer!", game_token=game_token)
     else:
-        answer = False
+        answer_bool = False
         return render_template('answer_right.html', user=current_user, answer="Wrong answer!", game_token=game_token)
 
 gameBp = Blueprint('game', __name__)
@@ -53,6 +68,7 @@ def StartGame():
         GameSession()
         return "loading..."
     else:
+        # TODO: Rewrite this to make sence 
         try_response = TryResponse()
         find_game_session = GameSessions.query.filter_by(player2="...").first()
         if find_game_session.player1 != current_user.username and try_response is None:
@@ -95,6 +111,8 @@ def ConnectGame():
 @gameBp.route('/game/<game_token>', methods = ['POST', 'GET'])
 @login_required
 def Game(game_token):
+
+    # TODO: Rewrite this using if statement to check is POST
 
     if game_token is None:
         return "no game token!"
