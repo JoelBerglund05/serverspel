@@ -16,10 +16,12 @@ def GameSession():
     db.session.add(data)
     db.session.commit()
 
-def AddUserAnswer():
-    data = UserAnswers(user_answer=user_answer, answer=answer)
-    db.session.add(data)
-    db.session.commit()
+def AddUserAnswer(answer):
+    # TODO: Fix
+    if answer == True:
+        sql_data_question = GameSessions.query.filter_by(Player1=Current).first()
+        db.session.add(data)
+        db.session.commit()
 
 def GameQuestion():
     return Questions.query.filter_by(id=random.randint(1, 2)).first()
@@ -33,13 +35,13 @@ def TryResponse(request_response):
 
 def CheckAnswer(game_token, question, user_answer):
     sql_data_question = Questions.query.filter_by(question=question).first()
-
+    print(sql_data_question.answer)
     if sql_data_question.answer == user_answer:
-        answer = 1
+        answer = True
         AddUserAnswer()
         return render_template('answer_right.html', user=current_user, answer="Correct answer!", game_token=game_token)
     else:
-        answer = 0
+        answer = False
         return render_template('answer_right.html', user=current_user, answer="Wrong answer!", game_token=game_token)
 
 gameBp = Blueprint('game', __name__)
@@ -107,7 +109,7 @@ def Game(game_token):
         elif user_data[0] == None:
             return "not your turn!"
         else:
-            return CheckAnswer(user_data[1], user_data[2], user_data[0])
+            return CheckAnswer(user_data[1], user_data[2], user_data[0].lower())
     else:
         return render_template('game.html', user=current_user, active_games=game_session.player1, game_tokens=game_session.game_session_id)
 

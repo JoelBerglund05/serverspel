@@ -19,7 +19,7 @@ class Questions(db.Model):
     answer = db.Column(db.String(100))
 
 class GameSessions(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True) 
     player1 = db.Column(db.String(150))
     player2 = db.Column(db.String(150))
     game_session_id = db.Column(db.String(128))
