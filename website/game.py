@@ -1,6 +1,6 @@
 import random
 from curses import flash
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_user, login_required, current_user
 from . import db
 from .models import Questions, GameSessions
@@ -69,15 +69,14 @@ def StartGame():
         return "loading..."
     else:
         # TODO: Rewrite this to make sence 
-        try_response = TryResponse()
         find_game_session = GameSessions.query.filter_by(player2="...").first()
-        if find_game_session.player1 != current_user.username and try_response is None:
+        if find_game_session.player1 != current_user.username:
             find_game_session.player2 = current_user.username
             find_game_session.player_turn = current_user.username
             question_data = GameQuestion()
             find_game_session.current_question_id = question_data.id
             db.session.commit()
-            return render_template('start_game.html', user=current_user, question=question_data.question)
+            return redirect(url_for('game.Game', game_token=find_game_session.game_session_id))
         elif user_answer is None:
             GameSession()
             return render_template('created_game.html', user=current_user, message="Created game! Pleas check Connect to old game to see if we have found a new game.")
@@ -114,22 +113,15 @@ def Game(game_token):
 
     # TODO: Rewrite this using if statement to check is POST
 
-    if game_token is None:
-        return "no game token!"
-
     user_data = [TryResponse('user_answer'), game_token, TryResponse("question")]
-    print(user_data)
     game_session = GameSessions.query.filter_by(game_session_id=game_token).first()
-    if game_session.player1 == current_user.username or game_session.player2 == current_user.username and game_session.player_turn == current_user.username:
-        if user_data[0] == None and game_session.player_turn == current_user.username:
-            question = GameQuestion()
-            return render_template('game_question.html', user=current_user, question=question.question, game_token=user_data[1])
-        elif user_data[0] == None:
-            return "not your turn!"
-        else:
-            return CheckAnswer(user_data[1], user_data[2], user_data[0].lower())
+    if user_data[0] == None and game_session.player_turn == current_user.username:
+        question = GameQuestion()
+        return render_template('game_question.html', user=current_user, question=question.question, game_token=user_data[1])
+    elif user_data[0] == None:
+        return "not your turn!"
     else:
-        return render_template('game.html', user=current_user, active_games=game_session.player1, game_tokens=game_session.game_session_id)
+        return CheckAnswer(user_data[1], user_data[2], user_data[0].lower())
 
 @gameBp.route('/', methods = ['GET'])
 def Home():
