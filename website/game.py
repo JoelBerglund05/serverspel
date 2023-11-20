@@ -34,8 +34,14 @@ def ScoreAdder(answer_bool, game_token):
             sql_data.player_turn = sql_data.player2
         else:
             sql_data.player_turn = sql_sql.player1
+    standing = [sql_data.player1_score, sql_data.player2_score]
+    player = [sql_data.player1, sql_data.player2]
+    data = {
+        'standing': standing,
+        'player': player
+    }
     db.session.commit()
-
+    return data
 
 
 def GameQuestion():
@@ -53,11 +59,11 @@ def CheckAnswer(game_token, question, user_answer):
     print(sql_data_question.answer)
     if sql_data_question.answer == user_answer:
         answer_bool = True
-        ScoreAdder(answer_bool, game_token)
-        return render_template('answer_right.html', user=current_user, answer="Correct answer!", game_token=game_token)
+        score_data = ScoreAdder(answer_bool, game_token)
+        return render_template('answer_right.html', user=current_user, answer="Correct answer!", game_token=game_token, current_score=score_data.standing, player=score_data.player)
     else:
         answer_bool = False
-        return render_template('answer_right.html', user=current_user, answer="Wrong answer!", game_token=game_token)
+        return render_template('answer_right.html', user=current_user, answer="Wrong answer!", game_token=game_token, current_score=score_data.standing, player=score_data.player)
 
 gameBp = Blueprint('game', __name__)
 

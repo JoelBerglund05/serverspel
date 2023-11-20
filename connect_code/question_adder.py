@@ -7,7 +7,7 @@ answer = input('Answer').lower()
 data = {
     'question': question_add,
     'answer': answer
-    }
+}
 
 post_value = connect_server.Post.PostData(data, "questionadd")
 

@@ -12,6 +12,14 @@ utan det kommer
 
 det verkar funka bra så jag låter det vara så tills vidare.
 
+det var inget svårt denna vecka jag satt och ränsade kod som va svår läst 
+och ränsa bort lite debug kod. Så jag har inte sökt runt på något denna 
+veckan men framöver satssar jag på att skriva om lite kod jag inte förstår 
+vad jag tänkt runt men också göra om stukturen på min data bas, jag 
+protade med Lucas och han fråga lite över hur han kunnde bygga sin SQL 
+struktur och då insåg jag att .sen är nästa steg att bygga in lite 
+säkerhet åtminstonne ska jag läsa runt om kryptering. 
+
 ## vecka 45
 
 Jag fortsatte på det jag höll på med förra veckan men jag lyckades bygga färdigt det ganska
