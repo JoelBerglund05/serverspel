@@ -95,6 +95,9 @@ def StartGame():
 @gameBp.route('/connect-game', methods = ['POST', 'GET'])
 @login_required
 def ConnectGame():
+
+# TODO: len(active_games) som lägnd i en variabel som ska retuneras
+
     active_games = GameSessions.query.filter_by(player2=current_user.username).all()
     active_games += GameSessions.query.filter_by(player1=current_user.username).all()
     enemy_names = []
@@ -107,7 +110,7 @@ def ConnectGame():
             enemy_names.append(i.player2)
             game_tokens.append(i.game_session_id)
 
-        print(game_tokens)
+    print(game_tokens, len(game_tokens))
     if len(active_games) > 0:
         return render_template('game.html', user=current_user , active_games=enemy_names, game_tokens=game_tokens)
     else:
