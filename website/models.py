@@ -20,7 +20,6 @@ class Questions(db.Model):
 
 class GameSessions(db.Model):
     id = db.Column(db.Integer, primary_key=True) 
-    # TODO: Make players columns to a relationship column
     player1 = db.Column(db.String(150))
     player2 = db.Column(db.String(150))
     game_session_id = db.Column(db.String(128))
