@@ -112,7 +112,7 @@ def ConnectGame():
 
     print(game_tokens, len(game_tokens))
     if len(active_games) > 0:
-        return render_template('game.html', user=current_user , active_games=enemy_names, game_tokens=game_tokens)
+        return render_template('game.html', user=current_user , active_games=enemy_names, game_tokens=game_tokens, active_games_length=len(active_games))
     else:
         return render_template('created_game.html', user=current_user, message="No active game found")
 
