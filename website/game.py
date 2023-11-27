@@ -2,6 +2,7 @@ import random
 from curses import flash
 from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_user, login_required, current_user
+from sqlalchemy import or_
 from . import db
 from .models import Questions, GameSessions
 import sys 
@@ -40,6 +41,7 @@ def ScoreAdder(answer_bool, game_token):
         'standing': standing,
         'player': player
     }
+    print(data, "oihjefoihjseåfhjioåfsrhojifsgerhoidgrthiougrhiogrhoigrhjgroihjgrhoigrhoi")
     db.session.commit()
     return data
 
@@ -59,11 +61,12 @@ def CheckAnswer(game_token, question, user_answer):
     if sql_data_question.answer == user_answer:
         answer_bool = True
         score_data = ScoreAdder(answer_bool, game_token)
-        print(score_data)
+        print(score_data, "apokdpaowkdpoakwdpokawpokdpaokwdpokawpdokapwodkapwokdpaowkdpaowkdpoakwdpoik")
         return render_template('answer_right.html', user=current_user, answer="Correct answer!", 
         game_token=game_token, current_score=score_data['standing'], player=score_data['player'])
     else:
         answer_bool = False
+        score_data = ScoreAdder(answer_bool, game_token)
         return render_template('answer_right.html', user=current_user, answer="Wrong answer!", 
         game_token=game_token, current_score=score_data['standing'], player=score_data['player'])
 
@@ -97,9 +100,9 @@ def StartGame():
 @gameBp.route('/connect-game', methods = ['POST', 'GET'])
 @login_required
 def ConnectGame():
-    active_games = GameSessions.query.filter_by(player2=current_user.username).all()
+    active_games = GameSessions.query.filter(or_(GameSessions.player1 == current_user.username, GameSessions.player2 == current_user.username)).all()
     standing = [[game.player1_score, game.player2_score] for game in active_games]
-    active_games += GameSessions.query.filter_by(player1=current_user.username).all()
+    print(standing)
     enemy_names = []
     game_tokens = []
 
