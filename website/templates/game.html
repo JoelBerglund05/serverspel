@@ -1,9 +1,9 @@
 {% extends "index.html" %} {% block title %}Games{% endblock %} {% block content%}
 <li class="d-flex justify-content-around py-5">
-    {% for i in range(len(active_games)) %}
+    {% for i in range(active_games_length) %}
         {% if enemy != "..." %}
         <ul>
-            <a href="{{ url_for('game.Game', game_token=game_tokens[i]) }}">{{ active_games[i] }}</a>
+            <a href="{{ url_for('game.Game', game_token=game_tokens[i]) }}">{{ active_games[i] }} {{ standing[i] }}</a>
         </ul>
         {% endif %}
     {% endfor %}

@@ -26,4 +26,3 @@ class GameSessions(db.Model):
     player1_score = db.Column(db.Integer)
     player2_score = db.Column(db.Integer)
     player_turn = db.Column(db.String(150))
-    current_question_id = db.Column(db.Integer)

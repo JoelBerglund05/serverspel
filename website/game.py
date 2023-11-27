@@ -56,14 +56,16 @@ def TryResponse(request_response):
 
 def CheckAnswer(game_token, question, user_answer):
     sql_data_question = Questions.query.filter_by(question=question).first()
-    print(sql_data_question.answer)
     if sql_data_question.answer == user_answer:
         answer_bool = True
         score_data = ScoreAdder(answer_bool, game_token)
-        return render_template('answer_right.html', user=current_user, answer="Correct answer!", game_token=game_token, current_score=score_data.standing, player=score_data.player)
+        print(score_data)
+        return render_template('answer_right.html', user=current_user, answer="Correct answer!", 
+        game_token=game_token, current_score=score_data['standing'], player=score_data['player'])
     else:
         answer_bool = False
-        return render_template('answer_right.html', user=current_user, answer="Wrong answer!", game_token=game_token, current_score=score_data.standing, player=score_data.player)
+        return render_template('answer_right.html', user=current_user, answer="Wrong answer!", 
+        game_token=game_token, current_score=score_data['standing'], player=score_data['player'])
 
 gameBp = Blueprint('game', __name__)
 
@@ -95,13 +97,12 @@ def StartGame():
 @gameBp.route('/connect-game', methods = ['POST', 'GET'])
 @login_required
 def ConnectGame():
-
-# TODO: len(active_games) som lägnd i en variabel som ska retuneras
-
     active_games = GameSessions.query.filter_by(player2=current_user.username).all()
+    standing = [[game.player1_score, game.player2_score] for game in active_games]
     active_games += GameSessions.query.filter_by(player1=current_user.username).all()
     enemy_names = []
     game_tokens = []
+
     for i in active_games:
         if i.player1 != current_user.username:
             enemy_names.append(i.player1)
@@ -110,9 +111,8 @@ def ConnectGame():
             enemy_names.append(i.player2)
             game_tokens.append(i.game_session_id)
 
-    print(game_tokens, len(game_tokens))
     if len(active_games) > 0:
-        return render_template('game.html', user=current_user , active_games=enemy_names, game_tokens=game_tokens, active_games_length=len(active_games))
+        return render_template('game.html', user=current_user , active_games=enemy_names, game_tokens=game_tokens, active_games_length=len(active_games), standing=standing)
     else:
         return render_template('created_game.html', user=current_user, message="No active game found")
 
