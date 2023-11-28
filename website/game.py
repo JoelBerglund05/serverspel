@@ -17,7 +17,8 @@ def GameSession():
     player_name = current_user.username
     player1_score = 0
     player2_score = 0
-    data = GameSessions(player1=player_name, player2="...", game_session_id=game_session_id, player1_score=player1_score, player2_score=player2_score)
+    data = GameSessions(player1=player_name, player2="...", game_session_id=game_session_id, 
+    player1_score=player1_score, player2_score=player2_score)
     db.session.add(data)
     db.session.commit()
 
@@ -41,7 +42,6 @@ def ScoreAdder(answer_bool, game_token):
         'standing': standing,
         'player': player
     }
-    print(data, "oihjefoihjseåfhjioåfsrhojifsgerhoidgrthiougrhiogrhoigrhjgroihjgrhoigrhoi")
     db.session.commit()
     return data
 
@@ -61,7 +61,6 @@ def CheckAnswer(game_token, question, user_answer):
     if sql_data_question.answer == user_answer:
         answer_bool = True
         score_data = ScoreAdder(answer_bool, game_token)
-        print(score_data, "apokdpaowkdpoakwdpokawpokdpaokwdpokawpdokapwodkapwokdpaowkdpaowkdpoakwdpoik")
         return render_template('answer_right.html', user=current_user, answer="Correct answer!", 
         game_token=game_token, current_score=score_data['standing'], player=score_data['player'])
     else:
@@ -90,7 +89,8 @@ def StartGame():
             return redirect(url_for('game.Game', game_token=find_game_session.game_session_id))
         elif user_answer is None:
             GameSession()
-            return render_template('created_game.html', user=current_user, message="Created game! Pleas check Connect to old game to see if we have found a new game.")
+            return render_template('created_game.html', user=current_user, 
+            message="Created game! Pleas check Connect to old game to see if we have found a new game.")
         else:
             return CheckAnswer()
 
@@ -100,7 +100,8 @@ def StartGame():
 @gameBp.route('/connect-game', methods = ['POST', 'GET'])
 @login_required
 def ConnectGame():
-    active_games = GameSessions.query.filter(or_(GameSessions.player1 == current_user.username, GameSessions.player2 == current_user.username)).all()
+    active_games = GameSessions.query.filter(or_(GameSessions.player1 == current_user.username, 
+    GameSessions.player2 == current_user.username)).all()
     standing = [[game.player1_score, game.player2_score] for game in active_games]
     print(standing)
     enemy_names = []
@@ -115,7 +116,8 @@ def ConnectGame():
             game_tokens.append(i.game_session_id)
 
     if len(active_games) > 0:
-        return render_template('game.html', user=current_user , active_games=enemy_names, game_tokens=game_tokens, active_games_length=len(active_games), standing=standing)
+        return render_template('game.html', user=current_user , active_games=enemy_names, 
+        game_tokens=game_tokens, active_games_length=len(active_games), standing=standing)
     else:
         return render_template('created_game.html', user=current_user, message="No active game found")
 
@@ -129,7 +131,8 @@ def Game(game_token):
     game_session = GameSessions.query.filter_by(game_session_id=game_token).first()
     if user_data[0] == None and game_session.player_turn == current_user.username:
         question = GameQuestion()
-        return render_template('game_question.html', user=current_user, question=question.question, game_token=user_data[1])
+        return render_template('game_question.html', user=current_user, question=question.question, 
+        game_token=user_data[1])
     elif user_data[0] == None:
         return "not your turn!"
     else:
